@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Calculadora de arroz para Yum Asia Sakura — blanco y integral">
+<meta name="theme-color" content="#1a1a2e">
+<title>Calculadora de Arroz · Yum Asia Sakura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sakura: #e8a0a8;
+    --sakura-dark: #c4666f;
+    --ink: #1a1a2e;
+    --parchment: #faf7f2;
+    --mist: #f0ece6;
+    --stone: #8a8a8a;
+    --integral: #7a6a4e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 40px;
+  }
+
+  .header {
+    background: var(--ink);
+    padding: 28px 24px 22px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 20px;
+    background: var(--parchment);
+    border-radius: 20px 20px 0 0;
+  }
+  .header-kana {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 11px;
+    color: var(--sakura);
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+  .header-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 26px;
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: 2px;
+  }
+  .header-title span { color: var(--sakura); font-weight: 600; }
+  .header-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+
+  .type-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--stone);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .type-btn {
+    background: #fff;
+    border: 2px solid #e8e3dc;
+    border-radius: 14px;
+    padding: 16px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    width: 100%;
+  }
+  .type-btn.blanco.active  { border-color: var(--sakura);   box-shadow: 0 4px 20px rgba(0,0,0,0.12); background: rgba(232,160,168,0.08); }
+  .type-btn.integral.active{ border-color: var(--integral); box-shadow: 0 4px 20px rgba(0,0,0,0.12); background: rgba(122,106,78,0.08); }
+  .type-icon { font-size: 28px; display: block; margin-bottom: 6px; }
+  .type-name { font-family: 'Noto Serif JP', serif; font-size: 14px; font-weight: 600; display: block; margin-bottom: 2px; }
+  .type-btn.blanco  .type-name { color: var(--sakura-dark); }
+  .type-btn.integral .type-name{ color: var(--integral); }
+  .type-sub { font-size: 10px; color: var(--stone); display: block; }
+
+  .input-section {
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  }
+  .input-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .input-title { font-size: 13px; font-weight: 500; color: var(--ink); }
+
+  .unit-toggle { display: flex; background: var(--mist); border-radius: 8px; padding: 3px; gap: 3px; }
+  .unit-btn {
+    padding: 4px 10px; border-radius: 6px; border: none;
+    background: transparent; font-size: 11px;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    color: var(--stone); transition: all 0.15s; font-weight: 500;
+  }
+  .unit-btn.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+  .qty-row { display: flex; align-items: center; gap: 12px; }
+  .qty-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: none;
+    font-size: 22px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0; font-weight: 300;
+  }
+  .qty-btn.minus { background: var(--mist); color: var(--stone); }
+  .qty-btn.plus-blanco   { background: var(--sakura-dark); color: #fff; }
+  .qty-btn.plus-integral { background: var(--integral);    color: #fff; }
+  .qty-btn:active { transform: scale(0.93); }
+
+  .qty-wrap { flex: 1; position: relative; }
+  .qty-input {
+    width: 100%; text-align: center; font-size: 32px;
+    font-family: 'Noto Serif JP', serif; font-weight: 400;
+    border: none; background: var(--mist); border-radius: 12px;
+    padding: 10px 8px; color: var(--ink); outline: none;
+    -webkit-appearance: none; -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .qty-unit {
+    position: absolute; bottom: 10px; right: 12px;
+    font-size: 10px; color: var(--stone);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  .persons-row { margin-top: 16px; }
+  .persons-label { font-size: 11px; color: var(--stone); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px; }
+  .persons-btns { display: flex; gap: 8px; }
+  .person-btn {
+    flex: 1; padding: 9px 4px; border-radius: 10px;
+    border: 1.5px solid #e8e3dc; background: #fff;
+    font-size: 12px; cursor: pointer; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; color: var(--stone);
+  }
+  .person-btn.active-blanco   { border-color: var(--sakura);   background: rgba(232,160,168,0.1); color: var(--sakura-dark); }
+  .person-btn.active-integral { border-color: var(--integral); background: rgba(122,106,78,0.1);  color: var(--integral); }
+
+  .warning {
+    background: #fff8e1; border: 1.5px solid #ffd54f;
+    border-radius: 12px; padding: 12px 14px; font-size: 12px;
+    color: #7a5c00; display: none; margin-bottom: 16px; line-height: 1.5;
+  }
+  .warning.show { display: block; }
+
+  .results {
+    background: var(--ink); border-radius: 18px;
+    padding: 22px 20px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .results::before {
+    content: '米'; position: absolute; right: -10px; top: -10px;
+    font-family: 'Noto Serif JP', serif; font-size: 100px;
+    color: rgba(255,255,255,0.04); line-height: 1; pointer-events: none;
+  }
+  .results-title { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 18px; }
+
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .result-card { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 12px; border: 1px solid rgba(255,255,255,0.08); }
+  .result-card.highlight     { border-color: var(--sakura);   background: rgba(232,160,168,0.1); }
+  .result-card.highlight-int { border-color: var(--integral); background: rgba(122,106,78,0.12); }
+  .result-icon  { font-size: 18px; margin-bottom: 6px; display: block; }
+  .result-label { font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; display: block; }
+  .result-value { font-family: 'Noto Serif JP', serif; font-size: 24px; color: #fff; font-weight: 300; line-height: 1; display: block; }
+  .result-unit  { font-size: 11px; color: rgba(255,255,255,0.45); margin-left: 4px; }
+
+  .ratio-bar-section { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.06); }
+  .ratio-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .ratio-text  { font-family: 'Noto Serif JP', serif; font-size: 13px; color: rgba(255,255,255,0.7); }
+  .bar-track   { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; position: relative; }
+  .bar-fill    { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+  .bar-fill.blanco   { background: var(--sakura); }
+  .bar-fill.integral { background: #a8956e; }
+  .bar-legend  { display: flex; gap: 14px; margin-top: 8px; }
+  .legend-dot  { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+  .legend-item { font-size: 10px; color: rgba(255,255,255,0.45); }
+
+  .tips-section { background: #fff; border-radius: 18px; padding: 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.05); margin-bottom: 20px; }
+  .tips-header  { font-family: 'Noto Serif JP', serif; font-size: 13px; color: var(--ink); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .tip-item     { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+  .tip-item:last-child { margin-bottom: 0; }
+  .tip-dot      { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .tip-dot.blanco   { background: var(--sakura); }
+  .tip-dot.integral { background: var(--integral); }
+  .tip-text     { font-size: 12.5px; color: #555; line-height: 1.55; }
+  .tip-strong   { font-weight: 600; color: var(--ink); }
+
+  .footer-note { text-align: center; font-size: 10.5px; color: var(--stone); opacity: 0.7; letter-spacing: 0.5px; line-height: 1.6; }
+  .footer-sakura { font-family: 'Noto Serif JP', serif; color: var(--sakura-dark); opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-kana">お米の計算機</div>
+  <div class="header-title"><span>Sakura</span> · Arroz</div>
+  <div class="header-sub">Calculadora Yum Asia</div>
+</div>
+
+<div class="container">
+
+  <p class="type-label">Tipo de arroz</p>
+  <div class="type-selector">
+    <button class="type-btn blanco active" id="btn-blanco">
+      <span class="type-icon">🍚</span>
+      <span class="type-name">Blanco</span>
+      <span class="type-sub">Redondo · Función arroz</span>
+    </button>
+    <button class="type-btn integral" id="btn-integral">
+      <span class="type-icon">🌾</span>
+      <span class="type-name">Integral</span>
+      <span class="type-sub">Función brown rice</span>
+    </button>
+  </div>
+
+  <div class="input-section">
+    <div class="input-header">
+      <span class="input-title">Cantidad de arroz</span>
+      <div class="unit-toggle">
+        <button class="unit-btn active" id="btn-tazas">Tazas</button>
+        <button class="unit-btn" id="btn-gramos">Gramos</button>
+      </div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn minus" id="btn-menos">−</button>
+      <div class="qty-wrap">
+        <input class="qty-input" type="number" id="qty" value="1.5" min="0.5" max="8" step="0.5">
+        <span class="qty-unit" id="unit-lbl">tazas</span>
+      </div>
+      <button class="qty-btn plus-blanco" id="btn-mas">+</button>
+    </div>
+    <div class="persons-row">
+      <p class="persons-label">Raciones rápidas</p>
+      <div class="persons-btns">
+        <button class="person-btn active-blanco" data-p="1">1 pers.</button>
+        <button class="person-btn" data-p="2">2 pers.</button>
+        <button class="person-btn" data-p="3">3 pers.</button>
+        <button class="person-btn" data-p="4">4 pers.</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning" id="warning">
+    ⚠️ <strong>Límite Sakura:</strong> Cerca o superando la capacidad máxima de <strong>1.5L</strong>. Máximo 8 tazas entre arroz + agua.
+  </div>
+
+  <div class="results">
+    <p class="results-title">Resultado</p>
+    <div class="result-grid">
+      <div class="result-card highlight" id="card-agua">
+        <span class="result-icon">💧</span>
+        <span class="result-label">Agua</span>
+        <span class="result-value" id="agua-val">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-icon">🍚</span>
+        <span class="result-label">Arroz</span>
+        <span class="result-value" id="arroz-val">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-icon">⚖️</span>
+        <span class="result-label">Peso seco</span>
+        <span class="result-value" id="gramos-val">—</span>
+      </div>
+      <div class="result-card">
+        <span class="result-icon">🍽️</span>
+        <span class="result-label">Raciones aprox.</span>
+        <span class="result-value" id="raciones-val">—</span>
+      </div>
+    </div>
+    <div class="ratio-bar-section">
+      <div class="ratio-label">
+        <span>Proporción arroz : agua</span>
+        <span class="ratio-text" id="ratio-txt">1 : 1.5</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill blanco" id="bar" style="width:40%"></div>
+      </div>
+      <div class="bar-legend">
+        <span class="legend-item"><span class="legend-dot" id="ldot" style="background:#e8a0a8"></span>Arroz</span>
+        <span class="legend-item"><span class="legend-dot" style="background:rgba(255,255,255,0.2)"></span>Agua</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tips-section">
+    <div class="tips-header">💡 <span id="tips-title">Consejos · Arroz Blanco</span></div>
+    <div id="tips-list"></div>
+  </div>
+
+  <p class="footer-note">
+    Calculadora para <span class="footer-sakura">Yum Asia Sakura</span><br>
+    Capacidad máx: 8 tazas (1.5L) · 1 taza = 180ml
+  </p>
+
+</div>
+
+<script>
+(function () {
+  var CFG = {
+    blanco: {
+      ratio: 1.5, gramsPer: 150, racionPer: 0.75, ratioLabel: '1 : 1.5', funcion: 'Arroz Blanco',
+      tips: [
+        { s: 'Lavar siempre:',     t: ' enjuaga 2-3 veces hasta agua casi transparente. Elimina el exceso de almidón.' },
+        { s: 'Remojo opcional:',   t: ' 15-30 min antes mejora la textura con arroz redondo.' },
+        { s: 'Función Sakura:',    t: ' usa «Arroz Blanco» o «Grano Corto». Deja reposar 10 min en Keep Warm antes de abrir.' },
+        { s: 'Agua fría siempre:', t: ' la lógica difusa de la Sakura necesita agua fría para calcular bien los tiempos.' },
+        { s: 'Sal:',               t: ' ½ cucharadita por cada 2 tazas, añádela al agua antes de cocinar.' }
+      ]
+    },
+    integral: {
+      ratio: 2.0, gramsPer: 160, racionPer: 0.75, ratioLabel: '1 : 2', funcion: 'Arroz Integral',
+      tips: [
+        { s: 'Remojo obligatorio:', t: ' mínimo 2 horas, idealmente toda la noche en la nevera.' },
+        { s: 'Función Sakura:',     t: ' usa siempre «Arroz Integral» (Brown Rice). El ciclo dura ~45-60 min, es normal.' },
+        { s: 'Ratio sin remojo:',   t: ' usa 2.5 tazas de agua. Con remojo overnight puedes bajar a 1.8 tazas.' },
+        { s: 'Textura firme:',      t: ' el integral nunca queda tan blando. Para más ternura, añade 0.25 tazas extra de agua.' },
+        { s: 'No abrir el ciclo:',  t: ' reposa 10-15 min en Keep Warm al terminar. Mejora mucho la textura final.' }
+      ]
+    }
+  };
+
+  var type = 'blanco';
+  var unit = 'tazas';
+
+  function setType(t) {
+    type = t;
+    document.querySelectorAll('.type-btn').forEach(function (b) { b.classList.remove('active'); });
+    document.getElementById('btn-' + t).classList.add('active');
+    document.getElementById('btn-mas').className = 'qty-btn plus-' + t;
+    updateTips();
+    calc();
+  }
+
+  function setUnit(u) {
+    unit = u;
+    document.getElementById('btn-tazas').classList.toggle('active', u === 'tazas');
+    document.getElementById('btn-gramos').classList.toggle('active', u === 'gramos');
+    document.getElementById('unit-lbl').textContent = u === 'tazas' ? 'tazas' : 'g';
+    var inp = document.getElementById('qty');
+    var cfg = CFG[type];
+    if (u === 'gramos') {
+      inp.value = Math.round(parseFloat(inp.value) * cfg.gramsPer);
+      inp.min = 50; inp.max = 1200; inp.step = 25;
+    } else {
+      inp.value = (parseFloat(inp.value) / cfg.gramsPer).toFixed(1);
+      inp.min = 0.5; inp.max = 8; inp.step = 0.5;
+    }
+    calc();
+  }
+
+  function changeQty(delta) {
+    var inp = document.getElementById('qty');
+    var v = parseFloat(inp.value) + delta;
+    v = Math.max(parseFloat(inp.min), Math.min(parseFloat(inp.max), v));
+    if (unit === 'tazas') v = Math.round(v * 2) / 2;
+    else v = Math.round(v / 25) * 25;
+    inp.value = unit === 'tazas' ? v.toFixed(1) : v;
+    calc();
+  }
+
+  function setPersons(n) {
+    var cfg = CFG[type];
+    var tazas = n * cfg.racionPer;
+    var inp = document.getElementById('qty');
+    inp.value = unit === 'tazas' ? tazas.toFixed(1) : Math.round(tazas * cfg.gramsPer);
+    markPerson(n);
+    calc();
+  }
+
+  function markPerson(n) {
+    document.querySelectorAll('.person-btn').forEach(function (b) {
+      b.classList.remove('active-blanco', 'active-integral');
+      if (parseInt(b.getAttribute('data-p')) === n) b.classList.add('active-' + type);
+    });
+  }
+
+  function calc() {
+    var inp = document.getElementById('qty');
+    var val = parseFloat(inp.value) || 0;
+    var cfg = CFG[type];
+    var tazas = unit === 'tazas' ? val : val / cfg.gramsPer;
+    tazas = Math.max(0, Math.min(8, tazas));
+
+    var agua_ml   = tazas * cfg.ratio * 180;
+    var arroz_g   = tazas * cfg.gramsPer;
+    var raciones  = tazas / cfg.racionPer;
+    var total_t   = tazas + tazas * cfg.ratio;
+
+    var aguaEl = document.getElementById('agua-val');
+    if (agua_ml < 1000) {
+      aguaEl.innerHTML = Math.round(agua_ml) + '<span class="result-unit">ml</span>';
+    } else {
+      aguaEl.innerHTML = (agua_ml / 1000).toFixed(2) + '<span class="result-unit">L</span>';
+    }
+    document.getElementById('arroz-val').innerHTML   = tazas.toFixed(1) + '<span class="result-unit">tazas</span>';
+    document.getElementById('gramos-val').innerHTML  = Math.round(arroz_g) + '<span class="result-unit">g</span>';
+    document.getElementById('raciones-val').innerHTML = raciones.toFixed(1) + '<span class="result-unit">pers.</span>';
+
+    var pct = (tazas / (tazas + tazas * cfg.ratio)) * 100;
+    var bar = document.getElementById('bar');
+    bar.style.width = pct + '%';
+    bar.className = 'bar-fill ' + type;
+    document.getElementById('ratio-txt').textContent = cfg.ratioLabel;
+
+    var cardAgua = document.getElementById('card-agua');
+    cardAgua.className = 'result-card ' + (type === 'integral' ? 'highlight-int' : 'highlight');
+    document.getElementById('ldot').style.background = type === 'blanco' ? '#e8a0a8' : '#a8956e';
+
+    var warn = document.getElementById('warning');
+    if (total_t > 7.5) { warn.classList.add('show'); } else { warn.classList.remove('show'); }
+  }
+
+  function updateTips() {
+    var cfg = CFG[type];
+    document.getElementById('tips-title').textContent = 'Consejos · ' + cfg.funcion;
+    document.getElementById('tips-list').innerHTML = cfg.tips.map(function (tip) {
+      return '<div class="tip-item"><div class="tip-dot ' + type + '"></div><span class="tip-text"><span class="tip-strong">' + tip.s + '</span>' + tip.t + '</span></div>';
+    }).join('');
+  }
+
+  // Event listeners
+  document.getElementById('btn-blanco').addEventListener('click',   function () { setType('blanco'); });
+  document.getElementById('btn-integral').addEventListener('click', function () { setType('integral'); });
+  document.getElementById('btn-tazas').addEventListener('click',    function () { setUnit('tazas'); });
+  document.getElementById('btn-gramos').addEventListener('click',   function () { setUnit('gramos'); });
+  document.getElementById('btn-menos').addEventListener('click',    function () { changeQty(unit === 'tazas' ? -0.5 : -25); });
+  document.getElementById('btn-mas').addEventListener('click',      function () { changeQty(unit === 'tazas' ?  0.5 :  25); });
+  document.getElementById('qty').addEventListener('input',          function () { calc(); });
+  document.querySelectorAll('.person-btn').forEach(function (b) {
+    b.addEventListener('click', function () { setPersons(parseInt(b.getAttribute('data-p'))); });
+  });
+
+  updateTips();
+  calc();
+})();
+</script>
+</body>
+</html>
